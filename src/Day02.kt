@@ -35,8 +35,7 @@ fun main() {
   println("Part2: ${part2(input)}")
 }
 
-private val rawTestInput =
-    """
+private val rawTestInput = """
     7 6 4 2 1
     1 2 7 8 9
     9 7 6 2 1
