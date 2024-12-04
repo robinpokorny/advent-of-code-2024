@@ -3,30 +3,43 @@ typealias World = Map<Point, Char>
 private fun parse(input: List<String>): World =
     input
         .flatMapIndexed() { y, line ->
-          line.replace(Regex("[^XMAS]"), ".").mapIndexed { x, c ->
-            Point(x, y) to c
-          }
+          line.mapIndexed { x, c -> Point(x, y) to c }
         }
         .toMap()
 
-fun to3Direction(point: Point): List<Point> =
-    (1..3).scan(Point(0, 0)) { acc, _ -> acc + point }
+fun take3Steps(direction: Point): List<Point> =
+    (1..3).scan(Point(0, 0)) { acc, _ -> acc + direction }
 
-val directions = Point.AROUND.map(::to3Direction)
+val paths = Point.AROUND.map(::take3Steps)
 
 private fun part1(input: World): Int =
     input
         .filterValues { it == 'X' }
         .keys
         .sumOf { point ->
-          directions.count { dir ->
-            dir.mapNotNull { input[point + it] }.joinToString("") == "XMAS"
+          paths.count { dir ->
+            dir.map { input[point + it] }.joinToString("") == "XMAS"
           }
         }
 
-private fun part2(input: World): Int {
-  return 0
-}
+val cross =
+    listOf(
+        Point.LEFT + Point.UP,
+        Point.RIGHT + Point.DOWN,
+        Point.RIGHT + Point.UP,
+        Point.LEFT + Point.DOWN,
+    )
+
+val validCross = listOf("MSMS", "SMSM", "MSSM", "SMMS")
+
+private fun part2(input: World): Int =
+    input
+        .filterValues { it == 'A' }
+        .keys
+        .count { point ->
+          validCross.contains(
+              cross.map { input[point + it] }.joinToString(""))
+        }
 
 fun main() {
   val testInput = parse(rawTestInput)
@@ -37,7 +50,7 @@ fun main() {
   println("Part1: ${part1(input)}")
 
   // PART 2
-  assertEquals(part2(testInput), 0)
+  assertEquals(part2(testInput), 9)
   println("Part2: ${part2(input)}")
 }
 
