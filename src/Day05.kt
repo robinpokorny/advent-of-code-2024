@@ -1,50 +1,28 @@
-typealias Rule = Pair<Int, Int>
+import kotlin.collections.map
 
-typealias Update = List<Int>
-
-private fun parse(input: List<String>): Pair<List<Rule>, List<Update>> {
+private fun parse(input: List<String>): List<Pair<Boolean, Int>> {
   val breakIndex = input.indexOf("")
   val rules =
       input.take(breakIndex).map { line ->
         line.split("|").map { it.toInt() }.let { it[0] to it[1] }
       }
 
-  val updates =
-      input.drop(breakIndex + 1).map { line ->
-        line.split(",").map { it.toInt() }
-      }
+  return input
+      .drop(breakIndex + 1)
+      .map { line -> line.split(",").map { it.toInt() } }
+      .map {
+        val fixed =
+            it.sortedWith { a, b -> if (rules.contains(a to b)) -1 else 1 }
 
-  return rules to updates
+        (it == fixed) to fixed[fixed.size / 2]
+      }
 }
 
-private fun part1(input: Pair<List<Rule>, List<Update>>): Int {
-  val (rules, updates) = input
+private fun part1(input: List<Pair<Boolean, Int>>): Int =
+    input.filter { it.first }.sumOf { it.second }
 
-  val before = rules.groupBy({ it.first }, { it.second })
-
-  return updates
-      .filter { update ->
-        update.withIndex().all { (i, value) ->
-          update.take(i).intersect(before[value] ?: emptyList()).isEmpty()
-        }
-      }
-      .sumOf { it[it.size / 2] }
-}
-
-private fun part2(input: Pair<List<Rule>, List<Update>>): Int {
-  val (rules, updates) = input
-
-  val before = rules.groupBy({ it.first }, { it.second })
-
-  return updates
-      .filterNot { update ->
-        update.withIndex().all { (i, value) ->
-          update.take(i).intersect(before[value] ?: emptyList()).isEmpty()
-        }
-      }
-      .map { it.sortedWith { a, b -> if (rules.contains(a to b)) -1 else 1 } }
-      .sumOf { it[it.size / 2] }
-}
+private fun part2(input: List<Pair<Boolean, Int>>): Int =
+    input.filter { !it.first }.sumOf { it.second }
 
 fun main() {
   val testInput = parse(rawTestInput)
