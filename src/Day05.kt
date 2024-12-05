@@ -32,7 +32,18 @@ private fun part1(input: Pair<List<Rule>, List<Update>>): Int {
 }
 
 private fun part2(input: Pair<List<Rule>, List<Update>>): Int {
-  return 0
+  val (rules, updates) = input
+
+  val before = rules.groupBy({ it.first }, { it.second })
+
+  return updates
+      .filterNot { update ->
+        update.withIndex().all { (i, value) ->
+          update.take(i).intersect(before[value] ?: emptyList()).isEmpty()
+        }
+      }
+      .map { it.sortedWith { a, b -> if (rules.contains(a to b)) -1 else 1 } }
+      .sumOf { it[it.size / 2] }
 }
 
 fun main() {
@@ -44,7 +55,7 @@ fun main() {
   println("Part1: ${part1(input)}")
 
   // PART 2
-  assertEquals(part2(testInput), 0)
+  assertEquals(part2(testInput), 123)
   println("Part2: ${part2(input)}")
 }
 
