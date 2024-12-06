@@ -12,7 +12,7 @@ private fun parse(input: List<String>): List<Pair<Boolean, Int>> {
       .map { line -> line.split(",").map { it.toInt() } }
       .map {
         val fixed =
-            it.sortedWith { a, b -> if (rules.contains(a to b)) -1 else 1 }
+            it.sortedWith { a, b -> if (rules.contains(a to b)) -1 else 0 }
 
         (it == fixed) to fixed[fixed.size / 2]
       }
