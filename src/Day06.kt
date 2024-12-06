@@ -1,3 +1,5 @@
+import kotlin.system.measureTimeMillis
+
 data class World(
     val size: Point,
     val guard: Pair<Point, Point>,
@@ -32,14 +34,21 @@ fun isInside(world: World, point: Point): Boolean {
   return point.x in 0 until world.size.x && point.y in 0 until world.size.y
 }
 
-private fun part1(world: World): Int {
+// returns a pair of whether the guard is in a loop and the set of visited
+// points
+private fun solve(world: World): Pair<Boolean, Set<Point>> {
   var currentGuard = world.guard
-  val visited = mutableSetOf<Point>()
+  val visited = mutableSetOf<Pair<Point, Point>>()
 
   while (isInside(world, currentGuard.first)) {
-    visited.add(currentGuard.first)
+    if (currentGuard in visited) {
+      return true to emptySet()
+    }
+
+    visited.add(currentGuard)
 
     val next = currentGuard.first - currentGuard.second
+
     if (next !in world.obstacles) {
       currentGuard = next to currentGuard.second
     } else {
@@ -55,11 +64,17 @@ private fun part1(world: World): Int {
     }
   }
 
-  return visited.size
+  return false to visited.map { it.first }.toSet()
 }
 
+private fun part1(world: World): Int = solve(world).second.size
+
 private fun part2(world: World): Int {
-  return 0
+  val visited = solve(world).second
+
+  return visited.count { candidate ->
+    solve(world.copy(obstacles = world.obstacles + candidate)).first
+  }
 }
 
 fun main() {
@@ -71,8 +86,9 @@ fun main() {
   println("Part1: ${part1(input)}")
 
   // PART 2
-  assertEquals(part2(testInput), 0)
-  println("Part2: ${part2(input)}")
+  assertEquals(part2(testInput), 6)
+  measureTimeMillis { println("Part2: ${part2(input)}") }
+      .also { println("Time: $it ms") }
 }
 
 private val rawTestInput =
