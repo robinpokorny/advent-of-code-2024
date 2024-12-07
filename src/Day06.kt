@@ -1,6 +1,6 @@
 import kotlin.system.measureTimeMillis
 
-data class World(
+private data class World(
     val size: Point,
     val guard: Pair<Point, Point>,
     val obstacles: Set<Point>
@@ -30,12 +30,11 @@ private fun parse(input: List<String>): World {
   return World(size, guard, obstacles)
 }
 
-fun isInside(world: World, point: Point): Boolean {
+private fun isInside(world: World, point: Point): Boolean {
   return point.x in 0 until world.size.x && point.y in 0 until world.size.y
 }
 
-// returns a pair of whether the guard is in a loop and the set of visited
-// points
+// returns whether the guard is in a loop and the set of visited points
 private fun solve(world: World): Pair<Boolean, Set<Point>> {
   var currentGuard = world.guard
   val visited = mutableSetOf<Pair<Point, Point>>()

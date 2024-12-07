@@ -1,6 +1,6 @@
-typealias World = Map<Point, Char>
+private typealias World2 = Map<Point, Char>
 
-private fun parse(input: List<String>): World =
+private fun parse(input: List<String>): World2 =
     input
         .flatMapIndexed() { y, line ->
           line.mapIndexed { x, c -> Point(x, y) to c }
@@ -12,7 +12,7 @@ fun take3Steps(direction: Point): List<Point> =
 
 val paths = Point.AROUND.map(::take3Steps)
 
-private fun part1(input: World): Int =
+private fun part1(input: World2): Int =
     input
         .filterValues { it == 'X' }
         .keys
@@ -32,7 +32,7 @@ val cross =
 
 val validCross = listOf("MSMS", "SMSM", "MSSM", "SMMS")
 
-private fun part2(input: World): Int =
+private fun part2(input: World2): Int =
     input
         .filterValues { it == 'A' }
         .keys
