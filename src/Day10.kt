@@ -1,3 +1,5 @@
+import kotlin.collections.component1
+
 private fun parse(input: List<String>) =
     input
         .flatMapIndexed() { y, line ->
@@ -19,19 +21,28 @@ private fun findTrail(
       .sumOf { findTrail(topoMap, it, visited) }
 }
 
+private fun findDistinctTrails(topoMap: Map<Point, Int>, current: Point): Int {
+  if (topoMap[current] == 9) return 1
+
+  return Point.ADJANCENT.map { current + it }
+      .filter { it in topoMap && topoMap[it] == topoMap[current]!! + 1 }
+      .sumOf { findDistinctTrails(topoMap, it) }
+}
+
 private fun part1(topoMap: Map<Point, Int>): Int =
     topoMap
         .filter { (_, value) -> value == 0 }
         .keys
         .sumOf { findTrail(topoMap, it) }
 
-private fun part2(topoMap: Map<Point, Int>): Int {
-  return 0
-}
+private fun part2(topoMap: Map<Point, Int>): Int =
+    topoMap
+        .filter { (_, value) -> value == 0 }
+        .keys
+        .sumOf { findDistinctTrails(topoMap, it) }
 
 fun main() {
   val testInput = parse(rawTestInput)
-  println(testInput)
   val input = parse(readDayInput(10))
 
   // PART 1
@@ -39,7 +50,7 @@ fun main() {
   println("Part1: ${part1(input)}")
 
   // PART 2
-  assertEquals(part2(testInput), 0)
+  assertEquals(part2(testInput), 81)
   println("Part2: ${part2(input)}")
 }
 
