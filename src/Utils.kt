@@ -34,5 +34,6 @@ data class Point(val x: Int, val y: Int) {
             LEFT, RIGHT,
             DOWN + LEFT, DOWN, DOWN + RIGHT
         )
+        val ADJANCENT = listOf(UP, LEFT, RIGHT, DOWN)
     }
 }
