@@ -10,9 +10,15 @@ private fun parse(input: List<String>): Pair<Int, AntennaMap> =
             }
             .groupBy({ it.first }, { it.second })
 
-private fun part1(input: Pair<Int, AntennaMap>): Int {
-  val (size, antennaMap) = input
+private fun isOnMap(size: Int): (Point) -> Boolean = { point ->
+  point.x in 0 until size && point.y in 0 until size
+}
 
+private fun findAntinodes(
+    size: Int,
+    antennaMap: AntennaMap,
+    antinodesFromPair: (Point, Point) -> List<Point>
+): List<Point> {
   return antennaMap.values
       .flatMap<List<Point>, Point> { antennas ->
         val pairs =
@@ -20,20 +26,30 @@ private fun part1(input: Pair<Int, AntennaMap>): Int {
               antennas.drop(i).mapNotNull { b -> if (a != b) a to b else null }
             }
 
-        pairs.flatMap { (a, b) ->
+        pairs.flatMap { (a, b) -> antinodesFromPair(a, b) }
+      }
+      .toSet()
+      .filter(isOnMap(size))
+}
+
+private fun part1(input: Pair<Int, AntennaMap>): Int =
+    findAntinodes(input.first, input.second) { a, b ->
           val vector = a - b
           if (a.y > b.y) listOf(a - vector, b + vector)
           else listOf(a + vector, b - vector)
         }
-      }
-      .toSet()
-      .filter { point -> point.x in 0 until size && point.y in 0 until size }
-      .size
-}
+        .size
 
-private fun part2(input: Pair<Int, AntennaMap>): Int {
-  return 0
-}
+private fun part2(input: Pair<Int, AntennaMap>): Int =
+    findAntinodes(input.first, input.second) { a, b ->
+          generateSequence(a) { it - a + b }
+              .takeWhile(isOnMap(input.first))
+              .toList() +
+              generateSequence(a) { it + a - b }
+                  .takeWhile(isOnMap(input.first))
+                  .toList()
+        }
+        .size
 
 fun main() {
   val testInput = parse(rawTestInput)
@@ -44,7 +60,7 @@ fun main() {
   println("Part1: ${part1(input)}")
 
   // PART 2
-  assertEquals(part2(testInput), 0)
+  assertEquals(part2(testInput), 34)
   println("Part2: ${part2(input)}")
 }
 
